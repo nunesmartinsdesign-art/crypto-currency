@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Grelha de Cotações Cripto</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+          sans-serif;
+      }
+
+      body {
+        background: #0b1020;
+        color: #f5f5f5;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-rows: repeat(3, auto);
+        gap: 16px;
+      }
+
+      .card {
+        background: #151a30;
+        border-radius: 10px;
+        padding: 14px 16px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 120px;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 8px;
+      }
+
+      .name {
+        font-weight: 600;
+        font-size: 15px;
+      }
+
+      .symbol {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-left: 6px;
+      }
+
+      .price {
+        font-weight: 600;
+        color: #4ade80;
+        font-size: 15px;
+      }
+
+      .change {
+        font-size: 12px;
+        margin-top: 4px;
+      }
+
+      .change.negative {
+        color: #f97373;
+      }
+
+      .change.positive {
+        color: #4ade80;
+      }
+
+      .footer-link {
+        margin-top: 10px;
+        font-size: 11px;
+      }
+
+      .footer-link a {
+        color: #60a5fa;
+        text-decoration: none;
+      }
+
+      .footer-link a:hover {
+        text-decoration: underline;
+      }
+
+      .error {
+        margin-top: 16px;
+        color: #f97373;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-rows: auto;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Cotações Cripto (Top 12)</h1>
+    <div id="grid" class="grid"></div>
+    <div id="error" class="error"></div>
+
+    <script>
+      // URL do feed RSS sugerido (substitui pelo feed que estiveres a usar)
+      const RSS_URL = '/crypto-feed.xml';
+
+      // As 12 moedas que queremos mostrar
+      const TARGET_COINS = [
+        { name: 'Bitcoin', symbol: 'BTC' },
+        { name: 'Ethereum', symbol: 'ETH' },
+        { name: 'Tether', symbol: 'USDT' },
+        { name: 'BNB', symbol: 'BNB' },
+        { name: 'XRP', symbol: 'XRP' },
+        { name: 'USD Coin', symbol: 'USDC' },
+        { name: 'Solana', symbol: 'SOL' },
+        { name: 'TRON', symbol: 'TRX' },
+        { name: 'Lido Staked Ether', symbol: 'stETH' },
+        { name: 'Dogecoin', symbol: 'DOGE' },
+        { name: 'Toncoin', symbol: 'TON' },
+        { name: 'Cardano', symbol: 'ADA' },
+      ];
+
+      const gridEl = document.getElementById('grid');
+      const errorEl = document.getElementById('error');
+
+      async function loadFeed() {
+        try {
+          const res = await fetch(RSS_URL);
+          if (!res.ok) throw new Error('Falha ao carregar o feed RSS');
+          const text = await res.text();
+
+          const parser = new DOMParser();
+          const xml = parser.parseFromString(text, 'application/xml');
+
+          const items = Array.from(xml.querySelectorAll('item'));
+
+          // Para cada moeda alvo, tenta encontrar um item cujo título contenha o nome
+          TARGET_COINS.forEach((coin) => {
+            const item = items.find((it) => {
+              const title = it.querySelector('title')?.textContent || '';
+              return title.toLowerCase().includes(coin.name.toLowerCase());
+            });
+
+            // Se não encontrar, cria um card "vazio" com aviso
+            if (!item) {
+              createCard(coin, {
+                price: '—',
+                change: 'Sem dados',
+                link: '#',
+              });
+              return;
+            }
+
+            const title = item.querySelector('title')?.textContent || coin.name;
+            const description =
+              item.querySelector('description')?.textContent || '';
+            const link = item.querySelector('link')?.textContent || '#';
+
+            // Tentativa simples de extrair preço e variação do texto da descrição
+            const { price, change, isPositive } = parseDescription(description);
+
+            createCard(
+              { name: coin.name, symbol: coin.symbol, title },
+              { price, change, link, isPositive }
+            );
+          });
+        } catch (err) {
+          console.error(err);
+          errorEl.textContent = 'Não foi possível carregar o feed de cotações.';
+        }
+      }
+
+      function parseDescription(desc) {
+        // Este parser é genérico e pode ser ajustado conforme o formato do feed
+        let price = '—';
+        let change = '';
+        let isPositive = null;
+
+        // Exemplo: tentar encontrar algo como "$42,000" ou "€2,000"
+        const priceMatch = desc.match(/[$€]\s?[\d.,]+/);
+        if (priceMatch) {
+          price = priceMatch[0];
+        }
+
+        // Exemplo: tentar encontrar algo como "+2.5%" ou "-1.2%"
+        const changeMatch = desc.match(/[-+]\s?\d+(\.\d+)?\s?%/);
+        if (changeMatch) {
+          change = changeMatch[0].replace(/\s+/g, '');
+          isPositive = change.startsWith('+');
+        }
+
+        return { price, change, isPositive };
+      }
+
+      function createCard(coin, data) {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const header = document.createElement('div');
+        header.className = 'card-header';
+
+        const left = document.createElement('div');
+        const nameEl = document.createElement('span');
+        nameEl.className = 'name';
+        nameEl.textContent = coin.name;
+
+        const symbolEl = document.createElement('span');
+        symbolEl.className = 'symbol';
+        symbolEl.textContent = coin.symbol ? `(${coin.symbol})` : '';
+
+        left.appendChild(nameEl);
+        left.appendChild(symbolEl);
+
+        const priceEl = document.createElement('div');
+        priceEl.className = 'price';
+        priceEl.textContent = data.price || '—';
+
+        header.appendChild(left);
+        header.appendChild(priceEl);
+
+        const changeEl = document.createElement('div');
+        changeEl.className = 'change';
+        if (data.change) {
+          changeEl.textContent = `24h: ${data.change}`;
+          if (data.isPositive === true) changeEl.classList.add('positive');
+          if (data.isPositive === false) changeEl.classList.add('negative');
+        } else {
+          changeEl.textContent = data.change || '';
+        }
+
+        const footer = document.createElement('div');
+        footer.className = 'footer-link';
+        if (data.link && data.link !== '#') {
+          footer.innerHTML = `<a href="${data.link}" target="_blank" rel="noopener noreferrer">Ver detalhes</a>`;
+        } else {
+          footer.textContent = 'Sem link disponível';
+        }
+
+        card.appendChild(header);
+        card.appendChild(changeEl);
+        card.appendChild(footer);
+
+        gridEl.appendChild(card);
+      }
+
+      loadFeed();
+    </script>
+  </body>
+</html>

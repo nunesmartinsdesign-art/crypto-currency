@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <rss version="2.0">
+      <channel>
+        <title>Criptomoedas - Top 12</title>
+        <link>https://example.com/crypto-feed</link>
+        <description>Feed automático com as 12 criptomoedas mais valiosas</description>
+        <language>pt</language>
+        
+      <item>
+        <title>Bitcoin</title>
+        <description>Preço: $89634.0000 — Variação 24h: 1.80%</description>
+        <link>https://www.coingecko.com/en/coins/bitcoin</link>
+      </item>
+    
+      <item>
+        <title>Ethereum</title>
+        <description>Preço: $2953.7200 — Variação 24h: 1.56%</description>
+        <link>https://www.coingecko.com/en/coins/ethereum</link>
+      </item>
+    
+      <item>
+        <title>Tether</title>
+        <description>Preço: $0.9991 — Variação 24h: -0.00%</description>
+        <link>https://www.coingecko.com/en/coins/tether</link>
+      </item>
+    
+      <item>
+        <title>Binancecoin</title>
+        <description>Preço: $886.4300 — Variação 24h: 1.89%</description>
+        <link>https://www.coingecko.com/en/coins/binancecoin</link>
+      </item>
+    
+      <item>
+        <title>Ripple</title>
+        <description>Preço: $1.9300 — Variação 24h: 1.82%</description>
+        <link>https://www.coingecko.com/en/coins/ripple</link>
+      </item>
+    
+      <item>
+        <title>Usd Coin</title>
+        <description>Preço: $0.9996 — Variação 24h: -0.00%</description>
+        <link>https://www.coingecko.com/en/coins/usd-coin</link>
+      </item>
+    
+      <item>
+        <title>Solana</title>
+        <description>Preço: $128.3800 — Variação 24h: 1.02%</description>
+        <link>https://www.coingecko.com/en/coins/solana</link>
+      </item>
+    
+      <item>
+        <title>Tron</title>
+        <description>Preço: $0.3028 — Variação 24h: 1.68%</description>
+        <link>https://www.coingecko.com/en/coins/tron</link>
+      </item>
+    
+      <item>
+        <title>Staked Ether</title>
+        <description>Preço: $2955.1400 — Variação 24h: 1.63%</description>
+        <link>https://www.coingecko.com/en/coins/staked-ether</link>
+      </item>
+    
+      <item>
+        <title>Dogecoin</title>
+        <description>Preço: $0.1248 — Variação 24h: 1.79%</description>
+        <link>https://www.coingecko.com/en/coins/dogecoin</link>
+      </item>
+    
+      <item>
+        <title>Toncoin</title>
+        <description>Preço: $0.0000 — Variação 24h: 0.00%</description>
+        <link>https://www.coingecko.com/en/coins/toncoin</link>
+      </item>
+    
+      <item>
+        <title>Cardano</title>
+        <description>Preço: $0.3614 — Variação 24h: 2.95%</description>
+        <link>https://www.coingecko.com/en/coins/cardano</link>
+      </item>
+    
+      </channel>
+    </rss>
