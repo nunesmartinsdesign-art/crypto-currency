@@ -1,45 +1,45 @@
-import fs from 'fs';
-import https from 'https';
+import fs from "fs";
+import https from "https";
 
 const coins = [
-  'bitcoin',
-  'ethereum',
-  'tether',
-  'binancecoin',
-  'ripple',
-  'usd-coin',
-  'solana',
-  'tron',
-  'staked-ether',
-  'dogecoin',
-  'toncoin',
-  'cardano',
+  "bitcoin",
+  "ethereum",
+  "tether",
+  "binancecoin",
+  "ripple",
+  "usd-coin",
+  "solana",
+  "tron",
+  "staked-ether",
+  "dogecoin",
+  "toncoin",
+  "cardano",
 ];
 
 const API_URL =
-  'https://api.coingecko.com/api/v3/simple/price?ids=' +
-  coins.join(',') +
-  '&vs_currencies=usd&include_24hr_change=true';
+  "https://api.coingecko.com/api/v3/simple/price?ids=" +
+  coins.join(",") +
+  "&vs_currencies=usd&include_24hr_change=true";
 
 function fetchJSON(url) {
   return new Promise((resolve, reject) => {
     https
       .get(url, (res) => {
-        let data = '';
-        res.on('data', (chunk) => (data += chunk));
-        res.on('end', () => resolve(JSON.parse(data)));
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => resolve(JSON.parse(data)));
       })
-      .on('error', reject);
+      .on("error", reject);
   });
 }
 
-(async () => {
+async function gerarFeed() {
   const prices = await fetchJSON(API_URL);
 
-  let items = '';
+  let items = "";
 
   for (const id of coins) {
-    const name = id.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    const name = id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
     const price = prices[id]?.usd ?? 0;
     const change = prices[id]?.usd_24h_change ?? 0;
@@ -68,9 +68,19 @@ function fetchJSON(url) {
     </rss>
   `;
 
-  fs.writeFileSync('crypto-feed.xml', rss.trim());
-  console.log('Feed atualizado com sucesso!');
-})();
+  fs.writeFileSync("crypto-feed.xml", rss.trim());
+  console.log("Feed atualizado com sucesso!");
+}
+
+// Corre imediatamente ao iniciar
+gerarFeed();
+
+// Atualiza a cada 10 segundos (podes mudar para 60000 para 60s)
+setInterval(() => {
+  console.log("Atualizando feed...");
+  gerarFeed();
+}, 10000);
+
 
 
 
