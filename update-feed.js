@@ -1,4 +1,3 @@
-import fs from "fs";
 import https from "https";
 
 const coins = [
@@ -33,14 +32,13 @@ function fetchJSON(url) {
   });
 }
 
-async function gerarFeed() {
+export async function gerarFeedXML() {
   const prices = await fetchJSON(API_URL);
 
   let items = "";
 
   for (const id of coins) {
     const name = id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-
     const price = prices[id]?.usd ?? 0;
     const change = prices[id]?.usd_24h_change ?? 0;
 
@@ -55,34 +53,16 @@ async function gerarFeed() {
     `;
   }
 
-  const rss = `
+  return `
     <?xml version="1.0" encoding="UTF-8"?>
     <rss version="2.0">
       <channel>
         <title>Criptomoedas - Top 12</title>
-        <link>https://example.com/crypto-feed</link>
+        <link>https://crypto-currency-vo5o.onrender.com</link>
         <description>Feed automático com as 12 criptomoedas mais valiosas</description>
         <language>pt</language>
         ${items}
       </channel>
     </rss>
-  `;
-
-  fs.writeFileSync("crypto-feed.xml", rss.trim());
-  console.log("Feed atualizado com sucesso!");
+  `.trim();
 }
-
-// Corre imediatamente ao iniciar
-gerarFeed();
-
-// Atualiza a cada 10 segundos (podes mudar para 60000 para 60s)
-setInterval(() => {
-  console.log("Atualizando feed...");
-  gerarFeed();
-}, 10000);
-
-
-
-
-
-
