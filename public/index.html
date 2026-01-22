@@ -261,7 +261,17 @@
         gridEl.appendChild(card);
       }
 
-      loadFeed();
+      function atualizarFeed() {
+  loadFeed(); // a tua função que já existe
+}
+
+// corre ao abrir a página
+atualizarFeed();
+
+// corre novamente a cada 60 segundos
+setInterval(atualizarFeed, 10000);
+
     </script>
   </body>
 </html>
+
