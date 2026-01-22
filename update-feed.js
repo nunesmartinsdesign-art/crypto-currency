@@ -71,3 +71,10 @@ function fetchJSON(url) {
   fs.writeFileSync('crypto-feed.xml', rss.trim());
   console.log('Feed atualizado com sucesso!');
 })();
+
+setInterval(() => {
+  console.log("Atualizando feed...");
+  gerarFeed(); // a função que gera o XML
+}, 10000);
+
+
